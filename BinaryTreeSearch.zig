@@ -40,14 +40,14 @@ const Queue = struct {
         self.size -= 1;
         return node;
     }
-};
 
-fn createQueueNode() ?*Queue.QueueNode {
-    return allocator.create(Queue.QueueNode) catch |err| {
-        std.debug.print("Error creating queuenode: {}", .{err});
-        return null;
-    };
-}
+    fn createQueueNode() ?*Queue.QueueNode {
+        return allocator.create(Queue.QueueNode) catch |err| {
+            std.debug.print("Error creating queuenode: {}", .{err});
+            return null;
+        };
+    }
+};
 
 const Node = struct {
     left: ?*Node = null,
@@ -99,12 +99,24 @@ fn inOrderFormat(temp: ?*Node, depth: u8) void {
         for (0..depth) |_| {
             std.debug.print(" ", .{});
         }
-        std.debug.print("{}\n", .{t.*.value});
+        std.debug.print("{}< \n", .{t.*.value});
         inOrderFormat(t.left, nd);
     }
 }
 
-//TODO: search in tree
+fn search(node: ?*Node, value: u8) ?*Node {
+    if (node == null or node.?.*.value == value) return node;
+    if (node.?.*.value < value) return search(node.?.*.right, value);
+    if (node.?.*.value > value) return search(node.?.*.left, value);
+    unreachable;
+}
+
+fn printResult(result: ?*Node) void {
+    if (result) |r| {
+        std.debug.print("Value is present: \n", .{});
+        inOrderFormat(r, 0);
+    } else std.debug.print("Value not present in tree\n", .{});
+}
 
 pub fn main() !void {
     var general_purpose_allocator = GeneralPurposeAllocator(.{}){};
@@ -126,6 +138,11 @@ pub fn main() !void {
     inOrderFormat(&node, 0);
     insert(&node, 12);
     insert(&node, 8);
+    insert(&node, 4);
+    insert(&node, 49);
     std.debug.print("\nInorder traversal after insertion: \n", .{});
     inOrderFormat(&node, 0);
+    printResult(search(&node, 12));
+    printResult(search(&node, 15));
+    printResult(search(&node, 20));
 }
