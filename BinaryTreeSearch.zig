@@ -57,25 +57,22 @@ const Node = struct {
 
 fn insert(node: *Node, value: u8) void {
     var queue = Queue{};
-    var temp: ?*Node = node;
-    queue.push(temp.?);
+    var temp: *Node = node;
+    queue.push(temp);
     while (queue.size > 0) {
-        temp = queue.pop();
-        if (value < temp.?.value) {
-            if (temp.?.left == null) {
-                temp.?.left = newNode(value);
-                break;
-            } else if (temp.?.left) |left| {
-                queue.push(left);
-            }
+        temp = queue.pop().?;
+        if (temp.left == null and value < temp.value) {
+            temp.left = newNode(value);
+            break;
+        } else if (value < temp.value) {
+            queue.push(temp.left.?);
         }
-        if (value > temp.?.value) {
-            if (temp.?.right == null) {
-                temp.?.right = newNode(value);
-                break;
-            } else if (temp.?.right) |right| {
-                queue.push(right);
-            }
+
+        if (temp.right == null and value > temp.value) {
+            temp.right = newNode(value);
+            break;
+        } else if (value > temp.value) {
+            queue.push(temp.right.?);
         }
     }
 }
