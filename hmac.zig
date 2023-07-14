@@ -8,9 +8,11 @@ pub fn main() void {
     std.debug.print("Custom hash message with secret: {}", .{std.fmt.fmtSliceHexLower(&hs)});
 }
 
+//Following https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.198-1.pdf
 //MAC(text)t = HMAC(K, text)t = H((K0 ¯ opad )|| H((K0 ¯ ipad) || text))t
 fn hmacSha256(out: *[32]u8, key: []const u8, text: []const u8) void {
     var fmKey: [64]u8 = undefined;
+    //Copy key to fmKey assuming is lower or equals than 64 bytes
     @memcpy(fmKey[0..key.len], key);
     @memset(fmKey[key.len..64], 0);
 
@@ -23,10 +25,12 @@ fn hmacSha256(out: *[32]u8, key: []const u8, text: []const u8) void {
         opad[i] = f ^ 0x5c;
     }
 
-    //XOR every byte of K with fixed hex 0x5c
+    //XOR every byte of K with fixed hex 0x36
     for (fmKey, 0..) |f, i| {
         ipad[i] = f ^ 0x36;
     }
+
+    //Update ipad and text to hash
     sha2.update(&ipad);
     sha2.update(text);
 
