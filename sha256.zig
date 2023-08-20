@@ -26,12 +26,7 @@ fn hash(out: *[32]u8, message: []const u8) void {
     var idx: usize = 0;
     var idxBuff: usize = 0;
     while (idx < 16) : (idx += 1) {
-        // std.debug.print("Bit 1: {b} bit 2: {b} bit 3: {b} bit 4: {b}\n", .{ buffer[idxBuff], buffer[idxBuff + 1], buffer[idxBuff + 2], buffer[idxBuff + 3] });
-
         blocks[idx] = @as(u32, buffer[idxBuff]) << 24 | @as(u24, buffer[idxBuff + 1]) << 16 | @as(u16, buffer[idxBuff + 2]) << 8 | buffer[idxBuff + 3];
-
-        // std.debug.print("Val: {b} idxbuff: {}\n", .{ blocks[idx], idxBuff });
-        // std.debug.print("{b}\n", .{blocks[idx]});
         idxBuff += 4;
     }
 
@@ -50,28 +45,10 @@ fn hash(out: *[32]u8, message: []const u8) void {
     };
     // var W: [64]u32 = undefined;
 
-    //First 16 values should be equals
-    // @memcpy(W[0..15], blocks[0..15]);
-
     var i: usize = 16;
     while (i < 64) : (i += 1) {
         //+% wraparound addition: if overflows exceeding the max value of u32 it will start from the min valu and viceversa
-        // var r = std.math.rotr(u32, W[i - 15], @as(u32, 7));
-        // std.debug.print("rotated {x} {x}\n", .{ r, rotateRight(W[i - 15], 7) });
-
-        // var r = std.math.rotr(u32, W[i - 15], @as(u32, 18));
-        // std.debug.print("rotated {x} {x}\n", .{ r, rotateRight(W[i - 15], 18) });
-        // std.debug.print("r {x} t {x}\n", .{ sigma0(W[i - 15]), sigma1(W[i - 2]) });
-
-        // std.debug.print("1: {b}, 2: {b}\n", .{ blocks[i - 15], blocks[i - 2] });
-        // var r = (std.math.rotr(u32, blocks[i - 15], @as(u32, 7)) ^ std.math.rotr(u32, blocks[i - 15], @as(u32, 18)) ^ (blocks[i - 15] >> 3));
-        // var t = (std.math.rotr(u32, blocks[i - 2], @as(u32, 17)) ^ std.math.rotr(u32, blocks[i - 2], @as(u32, 19)) ^ (blocks[i - 2] >> 10));
-
-        // std.debug.print("r {x} t {x}\n", .{ r, t });
         blocks[i] = sigma1(blocks[i - 2]) +% blocks[i - 7] +% sigma0(blocks[i - 15]) +% blocks[i - 16];
-        // blocks[i] = r +% blocks[i - 7] +% t +% blocks[i - 16];
-
-        // std.debug.print("s {x}\n", .{blocks[i]});
     }
 
     //Next step
@@ -84,13 +61,9 @@ fn hash(out: *[32]u8, message: []const u8) void {
     var g = H[6];
     var h = H[7];
 
-    // var P = [8]u32{ H[0], H[1], H[2], H[3], H[4], H[5], H[6], H[7] };
-
     for (0..64) |ix| {
-        // std.debug.print("a {x} b {x} c {x} d {x} e {x} f {x} g {x} h {x}\n", .{ a, b, c, d, e, f, g, h });
         var tOne = h +% capitalSigma1(e) +% ch(e, f, g) +% K[ix] +% blocks[ix];
         var tTwo = capitalSigma0(a) +% maj(a, b, c);
-        // std.debug.print("t1 {x} t2 {x}\n", .{ tOne, tTwo });
         h = g;
         g = f;
         f = e;
@@ -99,13 +72,7 @@ fn hash(out: *[32]u8, message: []const u8) void {
         c = b;
         b = a;
         a = tOne +% tTwo;
-
-        // std.debug.print("a {x} b {x} c {x} d {x} e {x} f {x} g {x} h {x}\n", .{ a, b, c, d, e, f, g, h });
     }
-
-    // for (H, 0..) |val, ix| {
-    //     std.debug.print("H{} {x}\n", .{ ix, val });
-    // }
 
     //Update H array adding with wraparound sign
     H[0] +%= a;
@@ -150,5 +117,4 @@ fn maj(x: u32, y: u32, z: u32) u32 {
 fn rotateRight(out: u32, n: u8) u32 {
     //Shift right N so we move the bits seven positions to the right, then shift left the less significant bits 32 - N. And then a bitwise or is applied
     return std.math.rotr(u32, out, n);
-    // return (out >> n) | (out << 32 - n));
 }
