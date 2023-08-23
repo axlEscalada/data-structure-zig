@@ -7,6 +7,7 @@ pub fn main() void {
     std.debug.print("{}", .{std.fmt.fmtSliceHexLower(&out)});
 }
 
+//Implemented following https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.180-4.pdf standard
 fn hash(out: *[32]u8, message: []const u8) void {
     //message lenght * 8 bits -> usize type its needed cast later
     var messageSize = message[0..].len * 8;
@@ -15,7 +16,7 @@ fn hash(out: *[32]u8, message: []const u8) void {
 
     // copy message[0..] to avoid end sentinel when pass only message
     @memcpy(buffer[0..message.len], message[0..]);
-    buffer[message.len] = 1 << 7;
+    buffer[message.len] = 0b10000000;
     @memset(buffer[message.len + 1 ..], 0);
     //i'm assuming here that i can store the size in the las byte of the array
     buffer[buffer.len - 1] = @intCast(messageSize);
