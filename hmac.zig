@@ -4,7 +4,8 @@ const Sha256 = std.crypto.hash.sha2.Sha256;
 
 pub fn main() void {
     var hs: [32]u8 = undefined;
-    hmacSha256(hs[0..], "key", "message");
+    hmacSha256(hs[0..], "l3}PlfSAHg7qZ#JmMPmnP}ZXgd/0vqhhEQsWhPAR", "1692984217/tokenRequestorsapiKey=MKMMLHKQQ66ZREX6X0V121d6LtY6mP4pfIvO-Q-_Oxdqp-pNk{\"operationType\":\"SUSPEND\",\"operationReason\":\"SUSPEND\",\"operatorId\":\"\",\"deviceInfo\":{\"deviceID\":\"\"},\"activationCode\":\"\"}");
+    // hmacSha256(hs[0..], "key", "message");
     std.debug.print("Custom hash message with secret: {}", .{std.fmt.fmtSliceHexLower(&hs)});
 }
 
